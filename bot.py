@@ -1,3 +1,4 @@
+import os
 import smtplib
 import requests
 import json
@@ -421,8 +422,8 @@ def main():
     
     # Configuration
     config = {
-        'email': "mukrimmhmd@gmail.com",
-        'app_password': "iguk mpfl rjot boxw",  # Replace with your Gmail app password
+        'email': os.getenv("EMAIL"),
+        'app_password': os.getenv("APP_PASSWORD"),  # Replace with your Gmail app password
         'cv_path': "Mukrim_CV.pdf",
         'run_interval_hours': 12,
         'job_keywords': [
