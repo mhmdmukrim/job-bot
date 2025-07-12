@@ -95,15 +95,17 @@ Mukrim Mohamed
     def job_already_applied(self, url: str) -> bool:
         """Check if job was already applied to"""
         try:
-            with open(self.applied_jobs_log, "r", encoding='utf-8', errors='ignore') as file:
-                return url in file.read()
+            with open(self.applied_jobs_log, 'r', encoding='utf-8', errors='ignore') as file:
+                reader = csv.reader(file)
+                total_applications = sum(1 for _ in reader)
+
         except FileNotFoundError:
             return False
 
     def mark_as_applied(self, job_data: Dict):
         """Mark job as applied with timestamp"""
         try:
-            with open(self.applied_jobs_log, "a", newline='') as file:
+            with open(self.applied_jobs_log, "a", newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
                 writer.writerow([
                     datetime.now().isoformat(),
@@ -131,6 +133,10 @@ Mukrim Mohamed
             
             content = response.content.decode('utf-8', errors='ignore')
             jobs = json.loads(content)
+            
+            # Then later...
+            desc = job.get("description", "").encode('utf-8', errors='ignore').decode('utf-8', errors='ignore')
+
 
             job_list = []
             
@@ -229,7 +235,10 @@ Mukrim Mohamed
             response.raise_for_status()
             
             content = response.content.decode('utf-8', errors='ignore')
-            data = json.loads(content)
+            jobs = json.loads(content)
+            
+            # Then later...
+            desc = job.get("description", "").encode('utf-8', errors='ignore').decode('utf-8', errors='ignore')
 
             job_list = []
 
