@@ -95,7 +95,7 @@ Mukrim Mohamed
     def job_already_applied(self, url: str) -> bool:
         """Check if job was already applied to"""
         try:
-            with open(self.applied_jobs_log, "r") as file:
+            with open(self.applied_jobs_log, "r", encoding='utf-8', errors='ignore') as file:
                 return url in file.read()
         except FileNotFoundError:
             return False
@@ -129,7 +129,9 @@ Mukrim Mohamed
             response = requests.get(url, headers=headers, timeout=30)
             response.raise_for_status()
             
-            jobs = response.json()
+            content = response.content.decode('utf-8', errors='ignore')
+            jobs = json.loads(content)
+
             job_list = []
             
             for job in jobs[1:]:  # Skip first element (metadata)
@@ -226,7 +228,9 @@ Mukrim Mohamed
             response = requests.get(url, headers=headers, timeout=30)
             response.raise_for_status()
             
-            data = response.json()
+            content = response.content.decode('utf-8', errors='ignore')
+            data = json.loads(content)
+
             job_list = []
 
             for job in data.get("jobs", []):
@@ -325,7 +329,7 @@ Mukrim Mohamed
             if not Path(self.applied_jobs_log).exists():
                 return {"total_applications": 0, "last_run": "Never"}
             
-            with open(self.applied_jobs_log, 'r') as file:
+            with open(self.applied_jobs_log, 'r', encoding='utf-8', errors='ignore') as file:
                 lines = file.readlines()
                 total_applications = len(lines)
                 
