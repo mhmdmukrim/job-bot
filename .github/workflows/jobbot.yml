@@ -1,0 +1,45 @@
+name: Run bot.py and update logs
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '30 2 * * *'  # Runs daily at 2:30 AM UTC
+  workflow_dispatch:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Python script
+        env:
+          EMAIL: ${{ secrets.EMAIL }}
+          APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+        run: python bot.py
+
+      - name: Commit and push updated .csv and .log files
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add '*.csv' '*.log' || true
+          git commit -m "📋 Auto-update CSV and LOG via GitHub Actions" || echo "No changes to commit"
+          git push || echo "Nothing to push"
